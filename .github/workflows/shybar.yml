@@ -1,0 +1,37 @@
+name: ShyBar
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    strategy:
+      matrix:
+        publishprofile: [ ReleaseProfile ]
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Install nbgv
+      uses: dotnet/nbgv@v0.4.0
+
+    - name: Publish app
+      run: dotnet publish -p:PublishProfile=$env:Profile
+      env:
+        Profile: ${{ matrix.publishprofile }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ShyBar
+        path: ShyBar\bin\Release\net5.0-windows\publish\ShyBar.exe
